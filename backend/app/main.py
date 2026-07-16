@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 
+from app.api.router import router
+from app.core.config import settings
+
 app = FastAPI(
-    title="NexusAI API",
-    description="AI-powered Software Engineering Workspace",
-    version="1.0.0",
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    debug=settings.DEBUG,
 )
 
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to NexusAI API 🚀"
-    }
+app.include_router(router)

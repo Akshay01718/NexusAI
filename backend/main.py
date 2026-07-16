@@ -1,6 +1,16 @@
-def main():
-    print("Hello from backend!")
+from fastapi import FastAPI
+
+from app.core.config import settings
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    debug=settings.DEBUG,
+)
 
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+async def root():
+    return {
+        "message": f"Welcome to {settings.APP_NAME} 🚀"
+    }
