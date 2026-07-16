@@ -193,12 +193,79 @@ The core relationships between entities are:
 | model_name | Model name |
 | availability | Active or inactive |
 
+
 ## 6. Relationships
+
+| Parent | Relationship | Child |
+|---------|--------------|-------|
+| User | One-to-Many | Project |
+| Project | One-to-Many | Workspace |
+| Workspace | One-to-Many | Conversation |
+| Conversation | One-to-Many | Message |
+| Workspace | One-to-Many | Artifact |
+| Project | One-to-Many | MemoryEntry |
+| Project | One-to-Many | AIInteraction |
+
 
 ## 7. Indexing Strategy
 
+The following fields should be indexed to improve query performance:
+
+- User email
+- Project owner (user_id)
+- Workspace project_id
+- Conversation workspace_id
+- Message conversation_id
+- Artifact workspace_id
+- MemoryEntry project_id
+- AIInteraction project_id
+
+Additional indexes may be introduced as usage patterns evolve.
+
+
 ## 8. Data Integrity
+
+To maintain consistency:
+
+- Every project belongs to exactly one user.
+- Every workspace belongs to exactly one project.
+- Every conversation belongs to exactly one workspace.
+- Every message belongs to exactly one conversation.
+- Every artifact belongs to exactly one workspace.
+- Memory entries belong to one project.
+- AI interactions belong to one project.
+
+Foreign key constraints should enforce these relationships.
+
 
 ## 9. Future Expansion
 
+The schema is designed to support future additions such as:
+
+- Team collaboration
+- Roles and permissions
+- GitHub integration
+- Plugin ecosystem
+- Autonomous AI agents
+- Version history
+- Project templates
+
+These features can be introduced without major changes to the existing schema.
+
+
 ## 10. ADR-002
+
+### Decision
+
+Model the database around business entities rather than individual application features.
+
+### Reason
+
+Using generic entities such as Workspace, Artifact, and MemoryEntry provides greater flexibility, reduces schema complexity, and allows new features to be introduced without creating additional tables.
+
+### Consequences
+
+- Smaller schema
+- Easier maintenance
+- Better scalability
+- More reusable data model
