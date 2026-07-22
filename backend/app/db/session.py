@@ -1,12 +1,18 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from app.core.config import settings
 
-DATABASE_URL = "postgresql+psycopg://postgres:password@localhost:5432/nexusai"
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 
 SessionLocal = sessionmaker(
     bind=engine,
     autoflush=False,
     autocommit=False,
 )
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
