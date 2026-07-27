@@ -5,6 +5,19 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserResponse
 from app.utils.security import hash_password
 
+from app.schemas.user import (
+    UserCreate,
+    UserResponse,
+    UserLogin,
+    Token,
+)
+
+from app.utils.auth import create_access_token
+from app.utils.security import (
+    hash_password,
+    verify_password,
+)
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
@@ -43,3 +56,42 @@ def register(
     )
 
     return new_user
+
+@router.post(
+    "/login",
+    response_model=Token,
+)
+def login(
+    user: UserLogin,
+    db: Session = Depends(get_db),
+):
+    db_user = user_repository.get_by_email(
+        db,
+        user.email,
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
+    if not verify_password(
+        user.password,
+        db_user.password_hash,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
+    access_token = create_access_token(
+        data={
+            "sub": db_user.email,
+        }
+    )
+
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+    )
